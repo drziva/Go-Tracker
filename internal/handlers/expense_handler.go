@@ -1,15 +1,13 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
 	"go-tracker/internal/dto"
-	"go-tracker/internal/service"
+	service "go-tracker/internal/services"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type ExpenseHandler struct {
@@ -70,14 +68,6 @@ func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
 
 	expense, err := h.service.UpdateExpense(id, dto)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"error": "expense not found",
-			})
-
-			return
-		}
-
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "error updating expense",
 		})
@@ -88,48 +78,48 @@ func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
 	c.JSON(http.StatusCreated, expense)
 }
 
-func (h *ExpenseHandler) FindAll(c *gin.Context) {
-	expenses, err := h.service.FindAllExpenses()
+// func (h *ExpenseHandler) FindAll(c *gin.Context) {
+// 	expenses, err := h.service.FindAllExpenses()
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "there has been an error getting expenses",
-		})
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"error": "there has been an error getting expenses",
+// 		})
 
-		return
-	}
+// 		return
+// 	}
 
-	c.JSON(http.StatusOK, expenses)
-}
+// 	c.JSON(http.StatusOK, expenses)
+// }
 
-func (h *ExpenseHandler) FindById(c *gin.Context) {
-	idParam := c.Param("id")
+// func (h *ExpenseHandler) FindById(c *gin.Context) {
+// 	idParam := c.Param("id")
 
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid id",
-		})
+// 	id, err := strconv.Atoi(idParam)
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"error": "invalid id",
+// 		})
 
-		return
-	}
+// 		return
+// 	}
 
-	expense, err := h.service.FindById(id)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"error": "expense not found",
-			})
+// 	expense, err := h.service.FindById(id)
+// 	if err != nil {
+// 		if errors.Is(err, gorm.ErrRecordNotFound) {
+// 			c.JSON(http.StatusNotFound, gin.H{
+// 				"error": "expense not found",
+// 			})
 
-			return
-		}
+// 			return
+// 		}
 
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "there has been an error getting the expense",
-		})
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"error": "there has been an error getting the expense",
+// 		})
 
-		return
-	}
+// 		return
+// 	}
 
-	c.JSON(http.StatusOK, expense)
-}
+// 	c.JSON(http.StatusOK, expense)
+// }

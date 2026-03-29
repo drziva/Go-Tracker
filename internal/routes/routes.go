@@ -1,27 +1,24 @@
 package routes
 
 import (
+	"go-tracker/internal/db"
 	"go-tracker/internal/handlers"
-	"go-tracker/internal/repository"
-	"go-tracker/internal/service"
+	service "go-tracker/internal/services"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func SetupRouter(db *gorm.DB) *gin.Engine {
+func SetupRouter(queries *db.Queries) *gin.Engine {
 	r := gin.Default()
 
-	expenseRepo := repository.NewExpenseRepository(db)
-
-	expenseService := service.NewExpenseService(expenseRepo)
+	expenseService := service.NewExpenseService(queries)
 
 	expenseHandler := handlers.NewExpenseHandler(expenseService)
 
 	api := r.Group("/api")
 	api.POST("/expenses", expenseHandler.CreateExpense)
-	api.GET("/expenses", expenseHandler.FindAll)
-	api.GET("/expenses/:id", expenseHandler.FindById)
+	// api.GET("/expenses", expenseHandler.FindAll)
+	// api.GET("/expenses/:id", expenseHandler.FindById)
 	api.PUT("/expenses/:id", expenseHandler.UpdateExpense)
 
 	return r

@@ -6,9 +6,11 @@ import (
 )
 
 func main() {
-	database := db.Connect()
+	pool := db.NewPostgresPool()
 
-	r := routes.SetupRouter(database)
+	queries := db.New(pool)
+
+	r := routes.SetupRouter(queries)
 
 	r.Run()
 }
