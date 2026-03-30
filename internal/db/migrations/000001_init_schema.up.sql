@@ -1,0 +1,7 @@
+CREATE TABLE expenses (
+    id SERIAL PRIMARY KEY,
+    amount NUMERIC(10, 2) NOT NULL,
+    title TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

@@ -4,7 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"go-tracker/internal/dto"
+	dto "go-tracker/internal/dto/expense"
+	"go-tracker/internal/mappers"
 	service "go-tracker/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -20,12 +21,15 @@ func NewExpenseHandler(s *service.ExpenseService) *ExpenseHandler {
 	}
 }
 
-// gin.Context is essentially going to be an object that will be providing us with all the information(http method, url, headers, body etc.) and tools(function such as ShouldBindJSON, JSON etc.) for handling one HTTP request, it gets created for EVERY request that hits
+// gin.Context is essentially going to be an object that will be providing us with all the information(http method, url, headers, body etc.)
+// and tools(function such as ShouldBindJSON, JSON etc.) for handling one HTTP request, it gets created for EVERY request that hits
 func (h *ExpenseHandler) CreateExpense(c *gin.Context) {
 	//Set up variable for request.body
 	var dto dto.CreateExpenseDTO
 
-	// This is SUPER IMPORTANT. Gin is going to expose a set of methods, one of them being ShouldBindJSON(&targetObject). This will try to parse the body of the request into the actual expense variable we just created, we then use this specific syntax check for error and then just return a 400 Bad Request error
+	// This is SUPER IMPORTANT. Gin is going to expose a set of methods, one of them being ShouldBindJSON(&targetObject).
+	// This will try to parse the body of the request into the actual expense variable we just created,
+	// we then use this specific syntax check for error and then just return a 400 Bad Request error
 	if err := c.ShouldBindJSON(&dto); err != nil { // shorthand error check syn
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -35,6 +39,7 @@ func (h *ExpenseHandler) CreateExpense(c *gin.Context) {
 	}
 
 	expense, err := h.service.CreateExpense(dto)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "could not create expense",
@@ -43,7 +48,7 @@ func (h *ExpenseHandler) CreateExpense(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, expense)
+	c.JSON(http.StatusCreated, mappers.ToExpenseResponse(expense))
 }
 
 func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
@@ -75,22 +80,28 @@ func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, expense)
+	c.JSON(http.StatusCreated, mappers.ToExpenseResponse(expense))
 }
 
-// func (h *ExpenseHandler) FindAll(c *gin.Context) {
-// 	expenses, err := h.service.FindAllExpenses()
+func (h *ExpenseHandler) FindAll(c *gin.Context) {
+	expenses, err := h.service.FindAllExpenses()
 
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"error": "there has been an error getting expenses",
-// 		})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "there was an error getting expenses",
+		})
 
-// 		return
-// 	}
+		return
+	}
 
-// 	c.JSON(http.StatusOK, expenses)
-// }
+	var expenseResponse []dto.ExpenseResponse
+
+	for _, expense := range expenses {
+		expenseResponse = append(expenseResponse, mappers.ToExpenseResponse(expense))
+	}
+
+	c.JSON(http.StatusOK, expenseResponse)
+}
 
 // func (h *ExpenseHandler) FindById(c *gin.Context) {
 // 	idParam := c.Param("id")

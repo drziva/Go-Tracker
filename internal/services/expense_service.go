@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"go-tracker/internal/db"
-	"go-tracker/internal/dto"
+	dto "go-tracker/internal/dto/expense"
 )
 
 type ExpenseService struct {
@@ -40,12 +40,12 @@ func (s *ExpenseService) UpdateExpense(id int, dto dto.UpdateExpenseDTO) (db.Exp
 	return expense, err
 }
 
-// func (s *ExpenseService) FindAllExpenses() ([]models.Expense, error) {
-// 	expenses, err := s.repo.FindAll()
+func (s *ExpenseService) FindAllExpenses() ([]db.Expense, error) {
+	expenses, err := s.queries.GetAllExpenses(context.Background())
 
-// 	return expenses, err
-// }
+	return expenses, err
+}
 
-// func (s *ExpenseService) FindById(id int) (*models.Expense, error) {
-// 	return s.repo.FindById(id)
+// func (s *ExpenseService) FindById(id int) (*db.Expense, error) {
+// 	expense, err := s.queries.GetExpenseByID(context.Background(), )
 // }

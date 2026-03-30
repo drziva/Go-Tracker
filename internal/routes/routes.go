@@ -17,7 +17,7 @@ func SetupRouter(queries *db.Queries) *gin.Engine {
 
 	api := r.Group("/api")
 	api.POST("/expenses", expenseHandler.CreateExpense)
-	// api.GET("/expenses", expenseHandler.FindAll)
+	api.GET("/expenses", expenseHandler.FindAll)
 	// api.GET("/expenses/:id", expenseHandler.FindById)
 	api.PUT("/expenses/:id", expenseHandler.UpdateExpense)
 
